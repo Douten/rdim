@@ -62,6 +62,12 @@ export default function StackSelector({ stackList, addImagesToStack }: StackSele
     flex-wrap: wrap;
   `;
 
+  const GetStackButton = styled(ActionButton)`
+    padding: .5em 1em;
+    border-radius: 5px;
+    aspect-ratio: initial;
+  `;
+
   if (stackList.length) {
     return null;
   }
@@ -75,11 +81,11 @@ export default function StackSelector({ stackList, addImagesToStack }: StackSele
         type="text"
         ref={stackNameInput}
       />
-      <ActionButton
+      <GetStackButton
         onClick={getStack}
       >
         Get Stack
-      </ActionButton>
+      </GetStackButton>
     </Wrapper>
   )
 }
