@@ -1,13 +1,15 @@
 import { useState, useMemo } from 'react';
 import AWS from 'aws-sdk';
+import styled from 'styled-components';
+import { ActionButton, StyledInput } from './StackList';
 
 
-interface StackListProps{
+interface StackSelectorProps{
     stackList: string[];
     addImagesToStack: (images: string[]) => void;
 }
 
-export default function StackSelector({ stackList, addImagesToStack }: StackListProps) {
+export default function StackSelector({ stackList, addImagesToStack }: StackSelectorProps) {
   const S3_BUCKET = process.env.REACT_APP_S3_BUCKET;
   const REGION = process.env.REACT_APP_REGION;
   const S3_URL = `https://${S3_BUCKET}.s3.${REGION}.amazonaws.com/`;
@@ -47,27 +49,38 @@ export default function StackSelector({ stackList, addImagesToStack }: StackList
     });
   };
 
+  const Wrapper = styled.div`
+    padding: 1em;
+    background: #3B4252;
+    width: 50vw;
+    margin: 0 auto 5vh;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #4C566A;
+    border-radius: 10px;
+  `;
+
   if (stackList.length) {
     return null;
   }
 
   return (
-    <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 flex-col gap-[10px]">
-    <div>
-      <div className="text-xl font-medium text-black">Stack Name</div>
-    </div>
-    <input
-      type="text"
-      className="border border-gray-300 p-2"
-      value={stackName}
-      onChange={(e) => setStackName(e.target.value)}
-    />
-    <button
-      className="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"
-      onClick={getStack}
-    >
-      Get Stack
-    </button>
-  </div>
+    <Wrapper>
+      <div>
+        <div className="text-xl font-medium">Stack Name</div>
+      </div>
+      <StyledInput
+        type="text"
+        value={stackName}
+        onChange={(e) => setStackName(e.target.value)}
+      />
+      <ActionButton
+        onClick={getStack}
+      >
+        Get Stack
+      </ActionButton>
+    </Wrapper>
   )
 }

@@ -12,37 +12,12 @@ function App() {
   const [stackFiles, setStackFiles] = useState<File[] | null>(null);
   const [stackList, setStackList] = useState<string[]>([]);
   const [stackName, setStackName] = useState<string>('');
-  const [currentStackIndex, setCurrentStackIndex] = useState<number>(0);
   const { uploadFile } = bucket();
 
 
   const [seconds, setSeconds] = useState(0);
   const [secondLimit, setSecondLimit] = useState(0);
   const [intervalId, setIntervalId] = useState<any>(null);
-
-  useEffect(() => {
-    if (!stackList.length) {
-      return
-    }
-
-    const interval = setInterval(() => nextImage(stackList), 20000);
-    return () => {
-      // if the data updates prematurely 
-      // we cancel the timeout and start a new one
-      clearTimeout(interval);
-    }
-  }, [currentStackIndex, stackList]);
-
-  function nextImage(stackList: string[]) {
-    console.log({ currentStackIndex, stackList })
-    // setCurrentStackIndex((currentStackIndex + 1) % (stackList.length || 1));
-
-
-
-    let newIndex = Math.floor(Math.random() * stackList.length);
-    // randomly set index for currentStackIndex
-    setCurrentStackIndex(newIndex);
-  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files?.length ? Array.from(e.target.files) : null;
@@ -61,7 +36,6 @@ function App() {
   }
 
 
-
   function EmptyState() {
 
     if (stackList.length > 0) {
@@ -76,7 +50,7 @@ function App() {
       text = "No Images found in stack. Add some below.";
     }
 
-    return <div className="text-xl font-medium text-black">{text}</div>;
+    return <div className="text-xl font-medium">{text}</div>;
   }
 
   function clearStackList() {
@@ -89,20 +63,21 @@ function App() {
 
   return (
     <div className="App">
-      <StackSelector stackList={stackList} addImagesToStack={addImagesToStack}  />
-      <EmptyState />
-      <StackList
-        stackList={stackList}
-        clearStackList={clearStackList}
-        currentStackIndex={currentStackIndex}
-      />
       <div>
-        { (stackName && stackList.length) && (
-          <div>
-            <input type="file" multiple onChange={handleFileChange} />
-            <button onClick={uploadFilesToStack}>Upload</button>
-          </div>
-        )}
+        <StackSelector stackList={stackList} addImagesToStack={addImagesToStack}  />
+        <EmptyState />
+        <StackList
+          stackList={stackList}
+          clearStackList={clearStackList}
+        />
+        <div>
+          { (stackName && stackList.length) && (
+            <div>
+              <input type="file" multiple onChange={handleFileChange} />
+              <button onClick={uploadFilesToStack}>Upload</button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
