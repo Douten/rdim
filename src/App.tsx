@@ -1,7 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef } from "react";
 
 import StackList from './components/StackList';
 import StackSelector from './components/StackSelector';
@@ -13,11 +12,6 @@ function App() {
   const [stackList, setStackList] = useState<string[]>([]);
   const [stackName, setStackName] = useState<string>('');
   const { uploadFile } = bucket();
-
-
-  const [seconds, setSeconds] = useState(0);
-  const [secondLimit, setSecondLimit] = useState(0);
-  const [intervalId, setIntervalId] = useState<any>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files?.length ? Array.from(e.target.files) : null;
@@ -34,7 +28,6 @@ function App() {
       uploadFile(file, stackName);
     });
   }
-
 
   function EmptyState() {
 
@@ -63,21 +56,19 @@ function App() {
 
   return (
     <div className="App">
+      <StackSelector stackList={stackList} addImagesToStack={addImagesToStack}  />
+      <EmptyState />
+      <StackList
+        stackList={stackList}
+        clearStackList={clearStackList}
+      />
       <div>
-        <StackSelector stackList={stackList} addImagesToStack={addImagesToStack}  />
-        <EmptyState />
-        <StackList
-          stackList={stackList}
-          clearStackList={clearStackList}
-        />
-        <div>
-          { (stackName && stackList.length) && (
-            <div>
-              <input type="file" multiple onChange={handleFileChange} />
-              <button onClick={uploadFilesToStack}>Upload</button>
-            </div>
-          )}
-        </div>
+        { (stackName && stackList.length) && (
+          <div>
+            <input type="file" multiple onChange={handleFileChange} />
+            <button onClick={uploadFilesToStack}>Upload</button>
+          </div>
+        )}
       </div>
     </div>
   );

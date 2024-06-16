@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 interface StackListProps{
@@ -22,22 +22,26 @@ export const StyledInput = styled.input`
   border: 1px solid #4C566A;
   border-radius: 5px;
   cursor: pointer;
+  width: 70px;
 `;
 
 export default function StackList({stackList, clearStackList}: StackListProps)
 {
+  const Wrapper = styled.div`
+    width: 100%;
+  `;
 
   const ActionWrapper = styled.div`
     padding: 1em;
-    background: ##3B4252;
-    width: 50vw;
-    margin: 0 auto 5vh;
+    background: #3B4252;
+    margin: 20px 10vw 0;
     display: flex;
     gap: 10px;
     align-items: center;
     justify-content: center;
     border: 1px solid #4C566A;
     border-radius: 10px;
+    flex-wrap: wrap;
   `;
 
   const ImageWrapper = styled.div`
@@ -46,6 +50,23 @@ export default function StackList({stackList, clearStackList}: StackListProps)
     justify-content: center;
     align-items: center;
     height: 70vh;
+    width: 100%;
+  `;
+
+  const StackImage = styled.img`
+    width: 100%;
+    object-fit: contain;
+  `;
+
+  const TimerWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #3B4252;
+    gap: 10px;
+    padding: .3em;
+    border: 1px solid #4C566A;
+    border-radius: 5px;
   `;
 
   const [currentStackIndex, setCurrentStackIndex] = useState<number>(0);
@@ -56,7 +77,7 @@ export default function StackList({stackList, clearStackList}: StackListProps)
     if (!stackList.length) {
       return
     }
-
+    
     const interval = setInterval(() => { 
       if (!pause) {
         randomImage(stackList)
@@ -73,8 +94,6 @@ export default function StackList({stackList, clearStackList}: StackListProps)
     console.log({ currentStackIndex, stackList })
     // setCurrentStackIndex((currentStackIndex + 1) % (stackList.length || 1));
 
-
-
     let newIndex = Math.floor(Math.random() * stackList.length);
     // randomly set index for currentStackIndex
     setCurrentStackIndex(newIndex);
@@ -85,16 +104,13 @@ export default function StackList({stackList, clearStackList}: StackListProps)
   }
 
   return (
-    <div>
+    <Wrapper>
       { stackList.length > 0 && 
         <ImageWrapper>
-          {stackList.map((imgUrl: string, index) => (
-            <img
-              className={imageClass(index === currentStackIndex)}
-              key={index}
-              src={imgUrl}
-              alt="stack" />
-          ))}
+          <StackImage
+            className={imageClass(true)}
+            src={stackList[currentStackIndex]}
+            alt="stack" />
         </ImageWrapper>
       }
       { stackList.length > 0 &&
@@ -102,15 +118,13 @@ export default function StackList({stackList, clearStackList}: StackListProps)
           <ActionButton onClick={clearStackList}>X</ActionButton>
           <ActionButton onClick={() => setPause(!pause)}>{pause ? 'Play' : 'Pause'}</ActionButton>
           <ActionButton onClick={() => randomImage(stackList)}>Next</ActionButton>
-          <div>
-            <StyledInput
-              type="number"
-              value={randomImageDuration / 1000}
-              onChange={(e) => setImageDuration(Number(e.target.value) * 1000)}
-            /> secs
-          </div>
+          <TimerWrapper>
+            <ActionButton onClick={() => setImageDuration(randomImageDuration - 1000)}>-</ActionButton>
+            {randomImageDuration / 1000} secs
+            <ActionButton onClick={() => setImageDuration(randomImageDuration + 1000)}>+</ActionButton>
+          </TimerWrapper>
         </ActionWrapper>
       }
-    </div>
+    </Wrapper>
   );
 }

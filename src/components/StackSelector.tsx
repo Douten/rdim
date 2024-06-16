@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import AWS from 'aws-sdk';
 import styled from 'styled-components';
 import { ActionButton, StyledInput } from './StackList';
@@ -21,17 +21,17 @@ export default function StackSelector({ stackList, addImagesToStack }: StackSele
     });
   }, []);
 
-  const [stackName, setStackName] = useState<string>('');
+  const stackNameInput = useRef<HTMLInputElement>(null);
 
   const getStack = async () => {
-    if (!stackName) {
+    if (!stackNameInput?.current?.value) {
       return;
     }
 
     const s3 = new AWS.S3({
       params: { 
         Bucket: S3_BUCKET,
-        Prefix: stackName
+        Prefix: stackNameInput?.current?.value.toLowerCase()
       },
       region: REGION,
     });
@@ -52,14 +52,14 @@ export default function StackSelector({ stackList, addImagesToStack }: StackSele
   const Wrapper = styled.div`
     padding: 1em;
     background: #3B4252;
-    width: 50vw;
-    margin: 0 auto 5vh;
+    margin: 0 5vw 0;
     display: flex;
     gap: 10px;
     align-items: center;
     justify-content: center;
     border: 1px solid #4C566A;
     border-radius: 10px;
+    flex-wrap: wrap;
   `;
 
   if (stackList.length) {
@@ -73,8 +73,7 @@ export default function StackSelector({ stackList, addImagesToStack }: StackSele
       </div>
       <StyledInput
         type="text"
-        value={stackName}
-        onChange={(e) => setStackName(e.target.value)}
+        ref={stackNameInput}
       />
       <ActionButton
         onClick={getStack}
