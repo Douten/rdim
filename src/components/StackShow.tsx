@@ -34,6 +34,12 @@ export const StyledInput = styled.input`
   width: 70px;
 `;
 
+export const ActionIconImg = styled.img`
+  width: 10px;
+  height: 10px;
+  object-fit: contain;
+`;
+
 export default function StackShow({ stack, closeStack, updateStack }: { stack: Stack, closeStack: () => void, updateStack: (stack: Stack) => void})
 {
   const Wrapper = styled.div`
@@ -88,12 +94,6 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
 
   const InvertSpan = styled.span`
     filter: invert(75%);
-  `;
-
-  const ActionIconImg = styled.img`
-    width: 10px;
-    height: 10px;
-    object-fit: contain;
   `;
 
   const [currentStackIndex, setCurrentStackIndex] = useState<number>(0);

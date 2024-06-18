@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import StackShow, { ActionButton } from './StackShow';
+import StackShow, { ActionButton, ActionIconImg } from './StackShow';
 import bucket from '../hooks/bucket';
-import { v4 as uuidv4 } from 'uuid';
+
+import editIcon from '../images/pencil.png';
+import deleteIcon from '../images/trash.fill.png';
 
 interface StackImage {
   imageUrl: string;
+  key: string;
   timer: number;
 }
 
 export interface Stack {
   stackId: string;
+  name: string;
   stackImages: StackImage[];
 }
 
@@ -24,6 +28,22 @@ export default function StackList()
     flex-direction: column;
   `;
 
+  const StackListkWrapper = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    width: 80%;
+    margin-top: 20px;
+  `;
+
+  const StackWrapper = styled.div`
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  `;
+
   const AddStackLabel = styled.label`
     padding: .5em 1em;
     background: #2E3440;
@@ -34,7 +54,7 @@ export default function StackList()
   `;
 
   const StackImage = styled.img`
-    padding: .5em 1em;
+    padding: 10px;
     background: #2E3440;
     color: #D8DEE9;
     border: 1px solid #4C566A;
@@ -45,9 +65,15 @@ export default function StackList()
     object-fit: cover;
   `;
 
+  const StackActionWrapper = styled.div`
+    display: flex;
+    gap: 10px;
+    align-items: center;r
+  `;
+
   const [stackList, setStackList] = useState<Stack[]>([]);
   const [selectedStackId, setSelectedStackId] = useState<string>('');
-  const { uploadFile, S3_URL } = bucket();
+  const { uploadStack, deleteStack } = bucket();
 
   useEffect(() => {
     let localStacklist = localStorage.getItem('stackList');
@@ -57,7 +83,6 @@ export default function StackList()
     }
   }, []);
 
-  // TODO: move this to a upload component
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files?.length ? Array.from(e.target.files) : null;
     // filter images file only
@@ -66,31 +91,28 @@ export default function StackList()
     if (!filteredFiles) {
       return;
     } else {
-      uploadStack(filteredFiles);
+      addStack(filteredFiles);
     }
   };
 
-  const uploadStack = async (files: File[]) => {
-    const stackName = uuidv4();
-    const stackImages = files.map((file, idx) => {
-      const fileName = `${stackName}-${idx}.${file.type.split('/')[1]}`;
-      return {
-        imageUrl: `${S3_URL}${fileName}`,
-        timer: 10000,
-      };
-    });
-    const newStackList = [...stackList, { stackId: stackName, stackImages }]
+  const addStack = async (files: File[]) => {
+    const uploadedStack = await uploadStack(files)
+    const newStackList = [...stackList, uploadedStack]
 
-    // upload files
-    await Promise.all(files.map(async (file, idx): Promise<void> => {
-      const fileName = `${stackName}-${idx}.${file.type.split('/')[1]}`;
-      await uploadFile(file, fileName);
-    }));
-    
-    setSelectedStackId(stackName);
+    setSelectedStackId(uploadedStack.stackId);
     setStackList(newStackList);
     localStorage.setItem('stackList', JSON.stringify(newStackList));
   };
+  
+  const removeStack = async (stack: Stack) => {
+    await deleteStack(stack);
+
+    console.log('deleting stack', stack.stackId)
+
+    const newStackList = stackList.filter((stackInList) => stackInList.stackId !== stack.stackId);
+    setStackList(newStackList);
+    localStorage.setItem('stackList', JSON.stringify(newStackList));
+  }
 
   return (
     <Wrapper>
@@ -123,18 +145,31 @@ export default function StackList()
           />
         )
       }
-      { !selectedStackId && stackList.map((stack) => {
-        return (
-          <div key={stack.stackId}>
-            <StackImage
-              key={stack.stackImages[0].imageUrl}
-              src={stack.stackImages[0].imageUrl}
-              onClick={() => setSelectedStackId(stack.stackId)}
-              alt="stack" />
-          </div>
-          );
-        })
-      }
+      <StackListkWrapper>
+        { !selectedStackId && stackList.map((stack) => {
+          return (
+            <StackWrapper key={stack.stackId}>
+              <StackImage
+                key={stack.stackImages[0].imageUrl}
+                src={stack.stackImages[0].imageUrl}
+                onClick={() => setSelectedStackId(stack.stackId)}
+                alt="stack" />
+              <span>
+                {stack.name}
+              </span>
+              <StackActionWrapper>
+                <ActionButton>
+                  <ActionIconImg src={editIcon} />
+                </ActionButton>
+                <ActionButton onClick={() => removeStack(stack)}>
+                  <ActionIconImg src={deleteIcon} />
+                </ActionButton>
+              </StackActionWrapper>
+            </StackWrapper>
+            );
+          })
+        }
+      </StackListkWrapper>
     </Wrapper>
   );
 }
