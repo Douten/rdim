@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
-import StackShow, { ActionButton, ActionIconImg } from './StackShow';
+import { ActionButton, ActionIconImg } from './StackShow';
 import { Stack } from './StackList';
-import Input from './Input';
 
 import editIcon from '../images/pencil.png';
 import deleteIcon from '../images/trash.fill.png';

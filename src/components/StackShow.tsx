@@ -60,6 +60,10 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
     border: 1px solid #4C566A;
     border-radius: 80px;
     flex-wrap: wrap;
+
+    @media (max-width: 400px) {
+      padding: 5px 10px;
+    }
   `;
 
   const ImageWrapper = styled.div`
@@ -67,7 +71,7 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80vh;
+    height: 40vh;
     width: 100%;
   `;
 
@@ -90,6 +94,13 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
     border: 1px solid #4C566A;
     border-radius: 5px;
     flex-grow: 1;
+
+    @media (max-width: 400px) {
+      padding: 5px 10px;
+      border: 0;
+      border-left: 1px solid #4C566A;
+      border-radius: 0;
+    }
   `;
 
   const InvertSpan = styled.span`

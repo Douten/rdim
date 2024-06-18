@@ -127,6 +127,7 @@ export default function StackList()
 
   return (
     <Wrapper>
+      { !selectedStackId && (
       <div>
         <AddStackLabel htmlFor="add-image">
           + Stack
@@ -138,6 +139,7 @@ export default function StackList()
           accept="image/png, image/gif, image/jpeg"
         />
       </div>
+      )}
       { selectedStackId && (
          <StackShow
             stack={stackList.find((stack) => stack.stackId === selectedStackId)!}
