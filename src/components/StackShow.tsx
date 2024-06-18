@@ -73,6 +73,10 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
     align-items: center;
     height: 40vh;
     width: 100%;
+
+    @media (orientation: landscape) {
+      height: 80vh;
+    }
   `;
 
   const StackImage = styled.img`
