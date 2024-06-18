@@ -20,6 +20,10 @@ body, .root, .App {
   pointer-events: none;
 }
 
+input[type="file"] {
+  display: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

@@ -1,36 +1,20 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import StackShow, { ActionButton } from './StackShow';
+import bucket from '../hooks/bucket';
+import { v4 as uuidv4 } from 'uuid';
 
-interface StackListProps{
-  stackList: string[];
-  clearStackList: () => void;
+interface StackImage {
+  imageUrl: string;
+  timer: number;
 }
 
-export const ActionButton = styled.button`
-  padding: .5em .5em;
-  background: #2E3440;
-  color: #D8DEE9;
-  border: 1px solid #4C566A;
-  border-radius: 50%;
-  cursor: pointer;
-  aspect-ratio: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: .8em;
-`;
+export interface Stack {
+  stackId: string;
+  stackImages: StackImage[];
+}
 
-export const StyledInput = styled.input`
-  padding: .5em;
-  background: #2E3440;
-  color: #D8DEE9;
-  border: 1px solid #4C566A;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 70px;
-`;
-
-export default function StackList({stackList, clearStackList}: StackListProps)
+export default function StackList()
 {
   const Wrapper = styled.div`
     width: 100%;
@@ -40,115 +24,116 @@ export default function StackList({stackList, clearStackList}: StackListProps)
     flex-direction: column;
   `;
 
-  const ActionWrapper = styled.div`
-    padding: .5em 3em;
-    background: #3B4252;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: space-between;
+  const AddStackLabel = styled.label`
+    padding: .5em 1em;
+    background: #2E3440;
+    color: #D8DEE9;
     border: 1px solid #4C566A;
-    border-radius: 80px;
-    flex-wrap: wrap;
-  `;
-
-  const ImageWrapper = styled.div`
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80vh;
-    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
   `;
 
   const StackImage = styled.img`
-    padding: 1em;
-    max-height: 100%;
-    max-width: 96%;
-    border-radius: 10px;
-    border: 1px solid #4C566A;
-    object-fit: contain;
-  `;
-
-  const TimerWrapper = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #3B4252;
-    gap: 10px;
-    padding: .3em;
+    padding: .5em 1em;
+    background: #2E3440;
+    color: #D8DEE9;
     border: 1px solid #4C566A;
     border-radius: 5px;
-    flex-grow: 1;
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
   `;
 
-  const InvertSpan = styled.span`
-    filter: invert(75%);
-  `;
-
-  const [currentStackIndex, setCurrentStackIndex] = useState<number>(0);
-  const [pause, setPause] = useState<boolean>(false);
-  const [randomImageDuration, setImageDuration] = useState<number>(15000);
+  const [stackList, setStackList] = useState<Stack[]>([]);
+  const [selectedStackId, setSelectedStackId] = useState<string>('');
+  const { uploadFile, S3_URL } = bucket();
 
   useEffect(() => {
-    if (!stackList.length) {
-      return
+    let localStacklist = localStorage.getItem('stackList');
+
+    if (localStacklist) {
+      setStackList(JSON.parse(localStacklist));
     }
+  }, []);
+
+  // TODO: move this to a upload component
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files?.length ? Array.from(e.target.files) : null;
+    // filter images file only
+    const filteredFiles = selectedFiles?.filter((file) => file.type.includes('image'));
     
-    const interval = setInterval(() => { 
-      if (!pause) {
-        randomImage(stackList)
-      }
-    }, randomImageDuration);
-    return () => {
-      // if the data updates prematurely 
-      // we cancel the timeout and start a new one
-      clearTimeout(interval);
+    if (!filteredFiles) {
+      return;
+    } else {
+      uploadStack(filteredFiles);
     }
-  }, [currentStackIndex, stackList, randomImageDuration]);
+  };
 
-  function randomImage(stackList: string[]) {
-    console.log({ currentStackIndex, stackList })
-    // setCurrentStackIndex((currentStackIndex + 1) % (stackList.length || 1));
+  const uploadStack = async (files: File[]) => {
+    const stackName = uuidv4();
+    const stackImages = files.map((file, idx) => {
+      const fileName = `${stackName}-${idx}.${file.type.split('/')[1]}`;
+      return {
+        imageUrl: `${S3_URL}${fileName}`,
+        timer: 10000,
+      };
+    });
+    const newStackList = [...stackList, { stackId: stackName, stackImages }]
 
-    let newIndex = Math.floor(Math.random() * stackList.length);
-    // randomly set index for currentStackIndex
-    setCurrentStackIndex(newIndex);
-  }
+    // upload files
+    await Promise.all(files.map(async (file, idx): Promise<void> => {
+      const fileName = `${stackName}-${idx}.${file.type.split('/')[1]}`;
+      await uploadFile(file, fileName);
+    }));
+    
+    setSelectedStackId(stackName);
+    setStackList(newStackList);
+    localStorage.setItem('stackList', JSON.stringify(newStackList));
+  };
 
   return (
     <Wrapper>
-      { stackList.length > 0 && 
-        <ImageWrapper>
-          <StackImage
-            src={stackList[currentStackIndex]}
-            alt="stack" />
-        </ImageWrapper>
+      <div>
+        <AddStackLabel htmlFor="add-image">
+          + Stack
+        </AddStackLabel>
+        <input
+          id="add-image"
+          type="file"
+          multiple onChange={handleFileChange}
+          accept="image/png, image/gif, image/jpeg"
+        />
+      </div>
+      { selectedStackId && (
+         <StackShow
+            stack={stackList.find((stack) => stack.stackId === selectedStackId)!}
+            closeStack={() => setSelectedStackId('')}
+            updateStack={(stack: Stack) => {
+              const newStackList = stackList.map((s) => {
+                if (s.stackId === stack.stackId) {
+                  return stack;
+                }
+                return s;
+              });
+              // setStackList(newStackList);
+              localStorage.setItem('stackList', JSON.stringify(newStackList));
+              }
+            }
+          />
+        )
       }
-      { stackList.length > 0 &&
-        <ActionWrapper>
-          <ActionButton onClick={clearStackList}>❌</ActionButton>
-          <ActionButton onClick={() => setPause(!pause)}>{pause ? '▶️' : '⏸️'}</ActionButton>
-          <ActionButton onClick={() => randomImage(stackList)}>🔄</ActionButton>
-          <TimerWrapper>
-            <ActionButton>{currentStackIndex}</ActionButton>
-            <ActionButton onClick={() => {
-              const newDuration = randomImageDuration - 1000;
-              if (newDuration < 1000) { return }
-              setImageDuration(randomImageDuration - 1000) }
-            }>
-              <InvertSpan>
-                ➖
-              </InvertSpan>
-            </ActionButton>
-            {randomImageDuration / 1000} secs
-            <ActionButton onClick={() => setImageDuration(randomImageDuration + 1000)}>
-              <InvertSpan>
-                ➕
-              </InvertSpan>
-            </ActionButton>
-          </TimerWrapper>
-        </ActionWrapper>
+      { !selectedStackId && stackList.map((stack) => {
+        return (
+          <div key={stack.stackId}>
+            <StackImage
+              key={stack.stackImages[0].imageUrl}
+              src={stack.stackImages[0].imageUrl}
+              onClick={() => setSelectedStackId(stack.stackId)}
+              alt="stack" />
+          </div>
+          );
+        })
       }
     </Wrapper>
   );

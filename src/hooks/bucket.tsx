@@ -29,6 +29,7 @@ export default function bucket() {
       if (err) {
         console.log(err);
       } else {
+        console.log({ data })
         const stackImgs = data.Contents?.map((content) => {
           return `${S3_URL}${content.Key}`;
         });
@@ -40,14 +41,14 @@ export default function bucket() {
     return imgs;
   };
 
-  const uploadFile = async (file: any, stackName: string) => {
-    if (!file || !stackName) {
+  const uploadFile = async (file: any, imgName: string) => {
+    if (!file || !imgName) {
       return;
     }
 
     const params = {
       Bucket: `${S3_BUCKET}`,
-      Key: `${stackName}-${file.name}`,
+      Key: `${imgName}`,
       Body: file,
     };
 
@@ -70,7 +71,6 @@ export default function bucket() {
 
       await upload.then((result) => {
         console.log(result.$response.error);
-        alert("File uploaded successfully.");
       });
     }
     catch (err) {
@@ -78,5 +78,5 @@ export default function bucket() {
     }
   };
 
-  return { uploadFile, getStack }
+  return { uploadFile, getStack, S3_URL }
 }
