@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import StackShow, { ActionButton, ActionIconImg } from './StackShow';
 import bucket from '../hooks/bucket';
-
-import editIcon from '../images/pencil.png';
-import deleteIcon from '../images/trash.fill.png';
+// components
+import StackShow, { ActionButton, ActionIconImg } from './StackShow';
+import StackItem from './StackItem';
 
 interface StackImage {
   imageUrl: string;
@@ -114,6 +113,18 @@ export default function StackList()
     localStorage.setItem('stackList', JSON.stringify(newStackList));
   }
 
+  const updateStackName = (stackId: string, name: string) => {
+    const newStackList = stackList.map((stack) => {
+      if (stack.stackId === stackId) {
+        stack.name = name;
+      }
+      return stack;
+    });
+
+    setStackList(newStackList);
+    localStorage.setItem('stackList', JSON.stringify(newStackList));
+  }
+
   return (
     <Wrapper>
       <div>
@@ -148,24 +159,13 @@ export default function StackList()
       <StackListkWrapper>
         { !selectedStackId && stackList.map((stack) => {
           return (
-            <StackWrapper key={stack.stackId}>
-              <StackImage
-                key={stack.stackImages[0].imageUrl}
-                src={stack.stackImages[0].imageUrl}
-                onClick={() => setSelectedStackId(stack.stackId)}
-                alt="stack" />
-              <span>
-                {stack.name}
-              </span>
-              <StackActionWrapper>
-                <ActionButton>
-                  <ActionIconImg src={editIcon} />
-                </ActionButton>
-                <ActionButton onClick={() => removeStack(stack)}>
-                  <ActionIconImg src={deleteIcon} />
-                </ActionButton>
-              </StackActionWrapper>
-            </StackWrapper>
+              <StackItem
+                key={stack.stackId}
+                stack={stack}
+                setSelect={setSelectedStackId}
+                setStackName={updateStackName}
+                removeStack={removeStack}
+              />
             );
           })
         }
