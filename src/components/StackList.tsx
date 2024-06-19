@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import bucket from '../hooks/bucket';
 // components
-import StackShow, { ActionButton, ActionIconImg } from './StackShow';
+import StackShow from './StackShow';
 import StackItem from './StackItem';
+import squareStacks from '../images/rectangle.stack.fill.png';
 
 interface StackImage {
   imageUrl: string;
@@ -46,28 +47,19 @@ export default function StackList()
     border: 1px solid #4C566A;
     border-radius: 5px;
     cursor: pointer;
-  `;
-
-  const StackImage = styled.img`
-    padding: 10px;
-    background: #2E3440;
-    color: #D8DEE9;
-    border: 1px solid #4C566A;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-  `;
-
-  const StackActionWrapper = styled.div`
     display: flex;
-    gap: 10px;
-    align-items: center;r
+    align-items: center;
+    gap: 8px;
+  `;
+
+  const StackIcon = styled.img`
+    width: 15px;
+    object-fit: contain;
   `;
 
   const [stackList, setStackList] = useState<Stack[]>([]);
   const [selectedStackId, setSelectedStackId] = useState<string>('');
+  const [addingStack, setAddingStack] = useState<boolean>(false);
   const { uploadStack, deleteStack } = bucket();
 
   useEffect(() => {
@@ -91,12 +83,14 @@ export default function StackList()
   };
 
   const addStack = async (files: File[]) => {
+    setAddingStack(true);
     const uploadedStack = await uploadStack(files)
     const newStackList = [...stackList, uploadedStack]
 
     setSelectedStackId(uploadedStack.stackId);
     setStackList(newStackList);
     localStorage.setItem('stackList', JSON.stringify(newStackList));
+    setAddingStack(false);
   };
   
   const removeStack = async (stack: Stack) => {
@@ -123,18 +117,23 @@ export default function StackList()
 
   return (
     <Wrapper>
-      { !selectedStackId && (
-      <AddStackWrapper>
-        <AddStackLabel htmlFor="add-image">
-          + Stack
-        </AddStackLabel>
-        <input
-          id="add-image"
-          type="file"
-          multiple onChange={handleFileChange}
-          accept="image/png, image/gif, image/jpeg"
-        />
-      </AddStackWrapper>
+      {!selectedStackId && (
+        <AddStackWrapper>
+          { addingStack
+            ?
+              <div className="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            :
+              <AddStackLabel htmlFor="add-image">
+                <StackIcon src={squareStacks} /> New Stack
+              </AddStackLabel>
+          }
+          <input
+            id="add-image"
+            type="file"
+            multiple onChange={handleFileChange}
+            accept="image/png, image/gif, image/jpeg"
+          />
+        </AddStackWrapper>
       )}
       { selectedStackId && (
          <StackShow
@@ -155,7 +154,7 @@ export default function StackList()
         )
       }
       <StackListkWrapper>
-        { !selectedStackId && stackList.map((stack) => {
+        {!selectedStackId && stackList.map((stack) => {
           return (
               <StackItem
                 key={stack.stackId}

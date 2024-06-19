@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { Stack } from './StackList';
@@ -126,7 +126,7 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
       // we cancel the timeout and start a new one
       clearTimeout(interval);
     }
-  }, [currentStackIndex, randomImageDuration, pause]);
+  }, [currentStackIndex, randomImageDuration, pause, stack]);
 
   function setStackImageTimer(timer: number) {
     setImageDuration(timer);
