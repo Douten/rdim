@@ -9,7 +9,6 @@ import playIcon from '../images/play.fill.png';
 import xmarkIcon from '../images/xmark.png';
 
 export const ActionButton = styled.button`
-  padding: .5em .5em;
   background: #2E3440;
   color: #D8DEE9;
   border: 1px solid #4C566A;
@@ -19,9 +18,9 @@ export const ActionButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: .8em;
-  width: 30px;
-  height: 30px;
+  font-size: 1em;
+  width: 35px;
+  height: 35px;
 `;
 
 export const StyledInput = styled.input`
@@ -35,8 +34,8 @@ export const StyledInput = styled.input`
 `;
 
 export const ActionIconImg = styled.img`
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
   object-fit: contain;
 `;
 
@@ -44,6 +43,7 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
 {
   const Wrapper = styled.div`
     width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -51,19 +51,24 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
   `;
 
   const ActionWrapper = styled.div`
-    padding: .5em 3em;
-    background: #3B4252;
+    padding: 5px 20px;
     display: flex;
     gap: 10px;
     align-items: center;
     justify-content: space-between;
-    border: 1px solid #4C566A;
-    border-radius: 80px;
+    border-radius: 10px;
     flex-wrap: wrap;
-
-    @media (max-width: 400px) {
-      padding: 5px 10px;
-    }
+    position: absolute;
+    bottom: 20px;
+    max-height: 15dvh;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.30),
+      inset 0 -1px 4px #FFFFFF03,
+      inset 0 -1px 1px #FFFFFF15,
+      inset 0 -1px 0px #FFFFFF20;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   `;
 
   const ImageWrapper = styled.div`
@@ -71,40 +76,30 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 40vh;
+    height: 80dvh;
+    padding: 5px;
     width: 100%;
+    padding: 10px;
 
-    @media (orientation: landscape) {
-      height: 80vh;
+    @media (max-width: 400px) {
+      height: 40dvh;
     }
   `;
 
   const StackImage = styled.img`
-    padding: 1em;
-    max-height: 100%;
-    max-width: 96%;
     border-radius: 10px;
-    border: 1px solid #4C566A;
     object-fit: contain;
+    max-height: 100%;
   `;
 
   const TimerWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #3B4252;
+    border-left: 1px solid #FFFFFF30;
     gap: 10px;
-    padding: .3em;
-    border: 1px solid #4C566A;
-    border-radius: 5px;
+    padding-left: 10px;
     flex-grow: 1;
-
-    @media (max-width: 400px) {
-      padding: 5px 10px;
-      border: 0;
-      border-left: 1px solid #4C566A;
-      border-radius: 0;
-    }
   `;
 
   const InvertSpan = styled.span`
@@ -131,7 +126,7 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
       // we cancel the timeout and start a new one
       clearTimeout(interval);
     }
-  }, [currentStackIndex, randomImageDuration]);
+  }, [currentStackIndex, randomImageDuration, pause]);
 
   function setStackImageTimer(timer: number) {
     setImageDuration(timer);
@@ -162,7 +157,7 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
           </ActionButton>
           <ActionButton onClick={() => randomImage(stack)}><ActionIconImg src={forwardIcon} /></ActionButton>
           <TimerWrapper>
-            <ActionButton>{currentStackIndex}</ActionButton>
+            {/* <ActionButton>{currentStackIndex}</ActionButton> */}
             <ActionButton onClick={() => {
               const newDuration = stack.stackImages[currentStackIndex].timer - 1000;
               if (newDuration < 1000) { return }

@@ -1,11 +1,12 @@
 body, .root, .App {
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
 }
 
 .App {
   text-align: center;
   background-color: #2E3440;
+  background: linear-gradient(109.6deg, rgb(40, 47, 62) 30.2%, #384560 60.1%);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -21,6 +21,7 @@ export default function StackList()
 {
   const Wrapper = styled.div`
     width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -32,15 +33,10 @@ export default function StackList()
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
     width: 80%;
-    margin-top: 20px;
   `;
 
-  const StackWrapper = styled.div`
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+  const AddStackWrapper = styled.div`
+    margin: 5dvh auto;
   `;
 
   const AddStackLabel = styled.label`
@@ -128,7 +124,7 @@ export default function StackList()
   return (
     <Wrapper>
       { !selectedStackId && (
-      <div>
+      <AddStackWrapper>
         <AddStackLabel htmlFor="add-image">
           + Stack
         </AddStackLabel>
@@ -138,7 +134,7 @@ export default function StackList()
           multiple onChange={handleFileChange}
           accept="image/png, image/gif, image/jpeg"
         />
-      </div>
+      </AddStackWrapper>
       )}
       { selectedStackId && (
          <StackShow
