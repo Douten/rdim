@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react';
-import styled from 'styled-components';
-import { ActionButton, ActionIconImg } from './StackShow';
-import { Stack } from './StackList';
 
-import editIcon from '../images/pencil.png';
-import deleteIcon from '../images/trash.fill.png';
-import checkmarkIcon from '../images/checkmark.png';
+// components
+import { Stack } from './StackList';
+// base components
+import { StackWrapper, StackActionWrapper } from './base/wrappers';
+import { ActionButton } from './base/buttons';
+import { Img, StackImageThumbnail } from './base/images';
+import { Input } from './base/inputs';
+import icon from './base/icons';
 
 interface StackItemProps {
   stack: Stack;
@@ -16,55 +18,19 @@ interface StackItemProps {
 
 export default function StackItem({ stack, setSelect, removeStack, setStackName }: StackItemProps)
 {
-  const StackWrapper = styled.div`
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  `;
-
-  const StackImage = styled.img`
-    padding: 10px;
-    background: #2E3440;
-    color: #D8DEE9;
-    border: 1px solid #4C566A;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-  `;
-
-  const StackActionWrapper = styled.div`
-    display: flex;
-    gap: 10px;
-    align-items: center;r
-  `;
-
-  const NameInput = styled.input`
-    padding: 5px;
-    background: #2E3440;
-    color: #D8DEE9;
-    border: 1px solid #4C566A;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 70px;
-  `;
-
   const [editName, setEditName] = useState(false);
   // const [name, setName] = useState('');
   const nameInput = useRef<HTMLInputElement>(null);
 
   return (
     <StackWrapper key={stack.stackId}>
-      <StackImage
+      <StackImageThumbnail
         key={stack.stackImages[0].imageUrl}
         src={stack.stackImages[0].imageUrl}
         onClick={() => setSelect(stack.stackId)}
         alt="stack" />
       { editName ?
-        (<NameInput autoFocus type="text" ref={nameInput} />):
+        (<Input autoFocus padding='5px' type="text" ref={nameInput} />):
         (<span>{stack.name}</span>)
       }
       <StackActionWrapper>
@@ -75,19 +41,19 @@ export default function StackItem({ stack, setSelect, removeStack, setStackName 
                 setStackName(stack.stackId, name);
                 setEditName(false);
               }}>
-                <ActionIconImg src={checkmarkIcon}/>
+                <Img src={icon.checkmark}/>
               </ActionButton>
             ) :
             (
               <ActionButton onClick={() => {
                 setEditName(true);
               }}>
-                <ActionIconImg src={editIcon} />
+                <Img src={icon.edit} />
               </ActionButton>
             )
           }
         <ActionButton onClick={() => removeStack(stack)}>
-          <ActionIconImg src={deleteIcon} />
+          <Img src={icon.delete} />
         </ActionButton>
       </StackActionWrapper>
     </StackWrapper>

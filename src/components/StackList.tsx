@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import bucket from '../hooks/bucket';
+
 // components
 import StackShow from './StackShow';
 import StackItem from './StackItem';
-import squareStacks from '../images/rectangle.stack.fill.png';
+// base components
+import { Wrapper, StackListkWrapper, AddStackWrapper } from './base/wrappers';
+import { Img } from './base/images';
+import { Button } from './base/buttons';
+import icon from './base/icons';
 
 interface StackImage {
   imageUrl: string;
@@ -18,43 +22,6 @@ export interface Stack {
   name: string;
   stackImages: StackImage[];
 }
-
-const Wrapper = styled.div`
-width: 100%;
-height: 100%;
-display: flex;
-align-items: center;
-gap: 10px;
-flex-direction: column;
-`;
-
-const StackListkWrapper = styled.div`
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-gap: 10px;
-width: 80%;
-`;
-
-const AddStackWrapper = styled.div`
-margin: 5dvh auto;
-`;
-
-const AddStackLabel = styled.label`
-padding: .5em 1em;
-background: #2E3440;
-color: #D8DEE9;
-border: 1px solid #4C566A;
-border-radius: 5px;
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 8px;
-`;
-
-const StackIcon = styled.img`
-width: 15px;
-object-fit: contain;
-`;
 
 export default function StackList()
 {
@@ -124,9 +91,9 @@ export default function StackList()
             ?
               <div className="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             :
-              <AddStackLabel htmlFor="add-image">
-                <StackIcon src={squareStacks} /> New Stack
-              </AddStackLabel>
+              <Button htmlFor="add-image">
+                <Img src={icon.squareStacks} /> New Stack
+              </Button>
           }
           <input
             id="add-image"
