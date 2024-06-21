@@ -87,7 +87,8 @@ export default function bucket() {
       return {
         imageUrl: `${S3_URL}${fileName}`,
         key: fileName,
-        timer: 10000,
+        timer: 20000,
+        score: []
       };
     });
 

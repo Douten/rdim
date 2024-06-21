@@ -10,6 +10,7 @@ interface StackImage {
   imageUrl: string;
   key: string;
   timer: number;
+  score?: number[];
 }
 
 export interface Stack {
@@ -18,45 +19,45 @@ export interface Stack {
   stackImages: StackImage[];
 }
 
+const Wrapper = styled.div`
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+gap: 10px;
+flex-direction: column;
+`;
+
+const StackListkWrapper = styled.div`
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+gap: 10px;
+width: 80%;
+`;
+
+const AddStackWrapper = styled.div`
+margin: 5dvh auto;
+`;
+
+const AddStackLabel = styled.label`
+padding: .5em 1em;
+background: #2E3440;
+color: #D8DEE9;
+border: 1px solid #4C566A;
+border-radius: 5px;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 8px;
+`;
+
+const StackIcon = styled.img`
+width: 15px;
+object-fit: contain;
+`;
+
 export default function StackList()
 {
-  const Wrapper = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-direction: column;
-  `;
-
-  const StackListkWrapper = styled.div`
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    width: 80%;
-  `;
-
-  const AddStackWrapper = styled.div`
-    margin: 5dvh auto;
-  `;
-
-  const AddStackLabel = styled.label`
-    padding: .5em 1em;
-    background: #2E3440;
-    color: #D8DEE9;
-    border: 1px solid #4C566A;
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  `;
-
-  const StackIcon = styled.img`
-    width: 15px;
-    object-fit: contain;
-  `;
-
   const [stackList, setStackList] = useState<Stack[]>([]);
   const [selectedStackId, setSelectedStackId] = useState<string>('');
   const [addingStack, setAddingStack] = useState<boolean>(false);
