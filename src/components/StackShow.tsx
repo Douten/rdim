@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// components
+// interfaces
 import { Stack } from './StackList';
 // base components
 import { ActionButton, ConfirmButton } from './base/buttons';
@@ -33,15 +33,20 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
   // the higher the score the less frequent the image will be shown
   function ltrIndex() {
 
-    const highestImageScore = stack.stackImages.reduce((a, b) => {
-      const aScore = a.score!.reduce((a, b) => a + b, 0);
-      const bScore = b.score!.reduce((a, b) => a + b, 0);
+    // get the highest score
+    const highestScore = stack.stackImages.reduce((acc, image) => {
+      const imageScore = image.score!.reduce((a, b) => a + b, 0);
+      return imageScore > acc ? imageScore : acc;
+    }, 0);
 
-      return aScore > bScore ? a : b;
-    })
+    // get the lowest score
+    const lowestScore = stack.stackImages.reduce((acc, image) => {
+      const imageScore = image.score!.reduce((a, b) => a + b, 0);
+      return imageScore < acc ? imageScore : acc;
+    }, 0);
 
-    const highestScore = highestImageScore.score!.reduce((a, b) => a + b, 0);
-    const randomScore = Math.floor(Math.random() * highestScore);
+    // get random between highest and lowest
+    const randomScore = Math.floor(Math.random() * (highestScore - lowestScore) + lowestScore);
     
     const imageScoreIdx = stack.stackImages.map((image, idx) => {
       const imageScore = image.score!.reduce((a, b) => a + b, 0);
@@ -50,13 +55,9 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
     })
     const randomlySortedScores = imageScoreIdx.sort(() => Math.random() - 0.5);
 
-    console.log({ randomlySortedScores, highestScore, randomScore })
-
     let scoreIndex = 0;
 
-    console.log("==== foreach ====")
     randomlySortedScores.some((image) => {
-      console.log({ image, randomScore, 'randomScore >= image.score': (randomScore >= image.score)})
       if (randomScore >= image.score) {
         scoreIndex = image.idx;
         return true;
@@ -86,7 +87,8 @@ export default function StackShow({ stack, closeStack, updateStack }: { stack: S
           <ActionButton onClick={() => pushScore(HOT_SCORE)}>
             <Img src={icon.flame} />
           </ActionButton>
-          <ConfirmButton onClick={() => pushScore(CORRECT_SCORE)}>
+          <ConfirmButton
+            onClick={() => pushScore(CORRECT_SCORE)}>
             <Img height="20px" width="20px" src={icon.checkmark} />
           </ConfirmButton>
           <ActionButton onClick={() => pushScore(WRONG_SCORE)}>

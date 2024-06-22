@@ -25,7 +25,6 @@ export const ConfirmButton = styled(ActionButton)`
   width: 50px;
   height: 50px;
   color: #D8DEE9;
-  // background gradient of light green
   background: #2e7950BB;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);

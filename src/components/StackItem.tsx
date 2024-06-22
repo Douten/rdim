@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-// components
+// interfaces
 import { Stack } from './StackList';
 // base components
 import { StackWrapper, StackActionWrapper } from './base/wrappers';
